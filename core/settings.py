@@ -52,7 +52,11 @@ DJANGO_APPS = [
 
 #Local
 PROJECT_APPS = [
-
+    'apps.accounts',
+    'apps.profiles',
+    'apps.projects',
+    'apps.services',
+    'apps.testimonials',
 ]
 
 THIRD_PARTY_APPS = [
