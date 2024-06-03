@@ -1,6 +1,11 @@
-# profiles/serializers.py
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from django.conf import settings
+from django.core.mail import send_mail
+from django.urls import reverse
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from .tokens import account_activation_token
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
@@ -19,7 +24,22 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         user = User.objects.create(
             username=validated_data['username'],
             email=validated_data['email'],
+            is_active=False  # Usuario inactivo hasta que confirme el correo
         )
         user.set_password(validated_data['password'])
         user.save()
+
+        # Enviar correo de activación
+        token = account_activation_token.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        activation_link = reverse('activate', kwargs={'uidb64': uid, 'token': token})
+        activation_url = f'http://your-domain.com{activation_link}'
+
+        subject = 'Activate Your Account'
+        message = f'Hi {user.username},\n\nPlease click the link below to activate your account:\n\n{activation_url}'
+        from_email = settings.DEFAULT_FROM_EMAIL
+        to_list = [user.email]
+
+        send_mail(subject, message, from_email, to_list)
+
         return user
