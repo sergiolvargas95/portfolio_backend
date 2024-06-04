@@ -20,7 +20,7 @@ class UserRegistrationView(APIView):
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context['request'] = self.request  # Asegúrate de pasar la solicitud al contexto
+        context['request'] = self.request
         return context
 class ActivateAccount(APIView):
     def get(self, request, uidb64, token, *args, **kwargs):
