@@ -18,6 +18,10 @@ class UserRegistrationView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context['request'] = self.request  # Asegúrate de pasar la solicitud al contexto
+        return context
 class ActivateAccount(APIView):
     def get(self, request, uidb64, token, *args, **kwargs):
         try:
