@@ -2,6 +2,9 @@ package com.example.backend.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.apache.catalina.User;
+
+import java.util.List;
 
 @Data
 @Entity
@@ -41,6 +44,7 @@ public class Profile {
     @Column(name = "curriculum_vitae")
     private String curriculum_vitae;
 
-
-
+    @OneToMany
+    @JoinColumn(name = "profile_id")
+    private List<Project> projectList;
 }
