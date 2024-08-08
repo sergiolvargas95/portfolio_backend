@@ -20,7 +20,7 @@ public class UserEntityService implements IUserService {
         if(userEntityRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new IllegalArgumentException("Username already taken.");
         }
-        
+
         user.setPassword(encryptPassword(user.getPassword()));
 
         return userEntityRepository.save(user);
@@ -45,5 +45,6 @@ public class UserEntityService implements IUserService {
     private String encryptPassword(String password) {
         //BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         //return encoder.encode(password);
+        return password;
     }
 }
