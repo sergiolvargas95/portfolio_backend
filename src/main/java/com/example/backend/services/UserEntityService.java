@@ -15,7 +15,6 @@ public class UserEntityService implements IUserService {
     @Autowired
     public UserEntityService(UserEntityRepository userEntityRepository) {
         this.userEntityRepository = userEntityRepository;
-
     }
 
     @Override
