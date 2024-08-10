@@ -3,9 +3,12 @@ package com.example.backend.services;
 import com.example.backend.models.UserEntity;
 import com.example.backend.repositories.UserEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
+@Service
 public class UserEntityService implements IUserService {
     private final UserEntityRepository userEntityRepository;
 
@@ -27,12 +30,19 @@ public class UserEntityService implements IUserService {
     }
 
     @Override
-    public UserEntity updateUser(UserEntity user) {
-        return userEntityRepository.save(user);
+    public UserEntity updateUser(UserEntity user, Long id) {
+        UserEntity userEntityOptional = userEntityRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("user with ID " + id + " not found."));
+
+        userEntityOptional.setUsername(user.getUsername());
+        userEntityOptional.setPassword(encryptPassword(user.getPassword()));
+        userEntityOptional.setEmail(user.getEmail());
+
+        return userEntityRepository.save(userEntityOptional);
     }
 
     @Override
-    public UserEntity findUserById(Long id) {
+    public UserEntity findById(Long id) {
         Optional<UserEntity> userEntityOptional = userEntityRepository.findById(id);
         return userEntityOptional.orElse(null);
     }
