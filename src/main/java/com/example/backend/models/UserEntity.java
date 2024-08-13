@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
@@ -41,4 +43,8 @@ public class UserEntity {
     @OneToMany
     @JoinColumn(name = "user_id")
     private List<Profile> profileList;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "roles_id"))
+    private Set<RoleEntity> roles = new HashSet<>();
 }
