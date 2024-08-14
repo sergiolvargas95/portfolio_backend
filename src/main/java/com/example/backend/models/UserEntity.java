@@ -2,15 +2,19 @@ package com.example.backend.models;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Table(name = "users")
 public class UserEntity {
     @Id
@@ -41,4 +45,8 @@ public class UserEntity {
     @OneToMany
     @JoinColumn(name = "user_id")
     private List<Profile> profileList;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "roles_id"))
+    private Set<RoleEntity> roles = new HashSet<>();
 }

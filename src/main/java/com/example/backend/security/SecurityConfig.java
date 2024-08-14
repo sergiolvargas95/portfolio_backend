@@ -1,5 +1,6 @@
 package com.example.backend.security;
 
+import com.example.backend.services.UserDetailServiceImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -15,6 +16,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
@@ -31,8 +33,16 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(http -> {
-                    http.requestMatchers(HttpMethod.GET,"/api/v1/superuser/**").hasAuthority("READ");
-                    http.requestMatchers(HttpMethod.POST,"/api/v1/superuser/").hasAuthority("CREATE");
+                    /**
+                     * APIS Publicas
+                     * */
+                    http.requestMatchers(HttpMethod.GET,"/api/v1/profile/**").permitAll();
+
+                    /**
+                     * APIS privadas
+                     * */
+                    http.requestMatchers(HttpMethod.GET,"/api/v1/superuser/**").hasRole("ADMIN");
+                    http.requestMatchers(HttpMethod.POST,"/api/v1/superuser/").hasRole("ADMIN");
 
                     http.anyRequest().denyAll();
                 })
@@ -45,28 +55,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationProvider authenticationProvider() {
+    public AuthenticationProvider authenticationProvider(UserDetailServiceImpl userDetailService) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setPasswordEncoder(passwordEncoder());
-        provider.setUserDetailsService(userDetailsService());
+        provider.setUserDetailsService(userDetailService);
         return provider;
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails userDetails = User.withUsername("sergio")
-                .password("*123456*")
-                .authorities("READ", "CREATE")
-                .build();
-
-        return new InMemoryUserDetailsManager(userDetails);
-    }
-
-    @Bean
     public PasswordEncoder passwordEncoder() {
-        return NoOpPasswordEncoder.getInstance();
+        return new BCryptPasswordEncoder();
     }
-
-
-
 }
